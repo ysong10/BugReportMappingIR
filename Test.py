@@ -359,7 +359,7 @@ class LeafNode(object):
           screen_width: The width of the screen associated with the element.
           screen_height: The height of the screen associated with the element.
         """
-        assert not element.findall('.//node')
+        # assert not element.findall('.//node')
         self.element = element
         self._screen_width = screen_width
         self._screen_height = screen_height
@@ -548,11 +548,12 @@ class ViewHierarchy(object):
         Returns:
           all_visible_leaves: The list of all the visible leaf elements.
         """
-        all_elements = [element for element in self._root.iter('*')]
+        all_elements = [element for element in self._root.iter('*')][1:]
         all_visible_leaves = [
-            element for element in all_elements if self._is_leaf(element) and
-                                                   strtobool(element.get('visible', default='true')) and
-                                                   self._is_within_screen_bound(element)
+            element for element in all_elements if
+            # self._is_leaf(element) and
+            strtobool(element.get('visible', default='true')) and
+            self._is_within_screen_bound(element)
         ]
         return all_visible_leaves
 
@@ -632,17 +633,16 @@ class ViewHierarchy(object):
 
 
 if __name__ == '__main__':
-    with open('/Users/antusaha/Documents/GitHub/JSON files/13.json', 'r') as f:
+    # I change the path for json path
+    with open('C:\\Users\\Yang Song\\Projects\\\google-research\\seq2act\\data\\rico_sca\\raw\\100.json', 'r') as f:
         data = json.load(f)
         data = json.dumps(data)
     #print(data)
-    vh = ViewHierarchy()
+    vh = ViewHierarchy(screen_width=config.RICO_SCREEN_WIDTH,
+                       screen_height=config.RICO_SCREEN_HEIGHT)
     vh.load_json(data)
     visibleLeaves = vh._get_visible_leaves()
     leafNodes = vh.get_leaf_nodes()
-    #print(vh.get_ui_objects())
-    uiObjects = vh.get_ui_objects()
-    print(uiObjects)
-    print(uiObjects.__len__())
-    #print(uiObjects.__getattribute__("text"))
-    print("Antu")
+
+    for uiObject in leafNodes:
+        print(uiObject.uiobject.text)
